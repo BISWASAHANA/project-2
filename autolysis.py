@@ -9,13 +9,10 @@ from sklearn.ensemble import IsolationForest
 from sklearn.cluster import KMeans
 from sklearn.impute import SimpleImputer
 
-# Prompt user to input OpenAI API key manually and handle errors
+# Prompt user to input OpenAI API key manually
 AIPROXY_TOKEN = input("Please enter your OpenAI API key: ").strip()
-if not AIPROXY_TOKEN:
-    raise ValueError("API key is required.")
 os.environ["AIPROXY_TOKEN"] = AIPROXY_TOKEN
 openai.api_key = AIPROXY_TOKEN
-
 try:
     import matplotlib
 except ImportError:
@@ -138,14 +135,25 @@ def generate_readme(eda_results):
             file.write("- Column names and data types:\n\n")
             for col, dtype in eda_results['data_types'].items():
                 file.write(f"  - {col}: {dtype}\n")
+            
             file.write("\n## Summary Statistics\n\n")
             for col, stats in eda_results['summary_statistics'].items():
                 file.write(f"### {col}\n")
                 for stat_name, value in stats.items():
                     file.write(f"- {stat_name}: {value}\n")
+            
             file.write("\n## Missing Values\n\n")
             for col, missing in eda_results['missing_values'].items():
                 file.write(f"- {col}: {missing} missing values\n")
+            
+            file.write("\n## Analytical Techniques Used\n\n")
+            file.write("The following analytical techniques were employed in this data analysis:\n")
+            file.write("1. **Missing Value Handling**: Missing values were imputed using the mean of the respective numeric columns.\n")
+            file.write("2. **Outlier Detection**: Isolation Forest was used to detect outliers in the dataset, marking values as outliers or inliers.\n")
+            file.write("3. **Clustering**: K-Means clustering was applied to categorize the data into distinct groups.\n")
+            file.write("4. **Exploratory Data Analysis (EDA)**: Basic EDA was performed, including summary statistics, data types, missing values analysis, and more.\n")
+            file.write("5. **Data Visualization**: Several visualizations, including a correlation heatmap, distribution plots, pairplots, and clustering visualizations, were generated to provide insights into the dataset.\n")
+            
             file.write("\n## Visualizations\n\n")
             file.write("![](correlation_heatmap.png)\n\n")
             for col in eda_results['columns'][:3]:
@@ -153,7 +161,6 @@ def generate_readme(eda_results):
             file.write("![](pairplot.png)\n\n")
             file.write("![](outliers.png)\n\n")
             file.write("![](clusters.png)\n\n")
-            # Add a section about dynamic prompts and OpenAI API use
             file.write("\n## OpenAI API Usage\n\n")
             file.write("The OpenAI API was used for processing and analysis. Dynamic prompts could be implemented in future versions.\n")
     except Exception as e:
