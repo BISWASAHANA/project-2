@@ -159,5 +159,6 @@ def main(file_path):
 
 if __name__ == "__main__":
     # For local environment, user will manually input the file path
-    file_path = input("Please provide the file path to your CSV: ").strip()
+    file_path = input('Please provide the file path to your CSV: ').strip('"').strip("'")
+
     main(file_path)
