@@ -9,10 +9,13 @@ from sklearn.ensemble import IsolationForest
 from sklearn.cluster import KMeans
 from sklearn.impute import SimpleImputer
 
-# Prompt user to input OpenAI API key manually
+# Prompt user to input OpenAI API key manually and handle errors
 AIPROXY_TOKEN = input("Please enter your OpenAI API key: ").strip()
+if not AIPROXY_TOKEN:
+    raise ValueError("API key is required.")
 os.environ["AIPROXY_TOKEN"] = AIPROXY_TOKEN
 openai.api_key = AIPROXY_TOKEN
+
 try:
     import matplotlib
 except ImportError:
@@ -150,6 +153,9 @@ def generate_readme(eda_results):
             file.write("![](pairplot.png)\n\n")
             file.write("![](outliers.png)\n\n")
             file.write("![](clusters.png)\n\n")
+            # Add a section about dynamic prompts and OpenAI API use
+            file.write("\n## OpenAI API Usage\n\n")
+            file.write("The OpenAI API was used for processing and analysis. Dynamic prompts could be implemented in future versions.\n")
     except Exception as e:
         print(f"Error generating README.md: {e}")
 
