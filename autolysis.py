@@ -1,16 +1,3 @@
-# /// script
-# requires-python = ">=3.11"
-# dependencies = [
-#   "pandas",
-#   "numpy",
-#   "matplotlib",
-#   "seaborn",
-#   "openai",
-#   "httpx",
-#   "scikit-learn"
-# ]
-# ///
-
 import os
 import pandas as pd
 import numpy as np
@@ -19,6 +6,7 @@ import seaborn as sns
 import openai
 from sklearn.ensemble import IsolationForest
 from sklearn.cluster import KMeans
+from sklearn.impute import SimpleImputer
 
 # Prompt user to input OpenAI API key manually
 AIPROXY_TOKEN = input("Please enter your OpenAI API key: ").strip()
@@ -26,14 +14,34 @@ os.environ["AIPROXY_TOKEN"] = AIPROXY_TOKEN
 openai.api_key = AIPROXY_TOKEN
 
 def load_csv(file_path):
-    """Load CSV file into a DataFrame."""
+    """Load CSV file into a DataFrame with error handling for encoding issues."""
     try:
-        df = pd.read_csv(file_path)
+        # Try reading with a different encoding (ISO-8859-1 / latin1)
+        df = pd.read_csv(file_path, encoding='ISO-8859-1')  # Handling encoding issue
         print("CSV file loaded successfully.")
         return df
     except Exception as e:
         print(f"Error loading CSV file: {e}")
         return None
+
+def handle_missing_values(df):
+    """Handle missing values by imputing with the mean for numeric columns."""
+    try:
+        numeric_columns = df.select_dtypes(include=[np.number]).columns.tolist()
+        imputer = SimpleImputer(strategy='mean')
+        df[numeric_columns] = imputer.fit_transform(df[numeric_columns])
+        print("Missing values imputed successfully.")
+    except Exception as e:
+        print(f"Error handling missing values: {e}")
+
+def remove_non_numeric_columns(df):
+    """Remove non-numeric columns from the DataFrame."""
+    try:
+        df = df.select_dtypes(include=[np.number])
+        print("Non-numeric columns removed.")
+    except Exception as e:
+        print(f"Error removing non-numeric columns: {e}")
+    return df
 
 def perform_eda(df):
     """Perform Exploratory Data Analysis (EDA) on the DataFrame."""
@@ -141,6 +149,8 @@ def main(file_path):
     """Main function to run the analysis pipeline."""
     df = load_csv(file_path)
     if df is not None:
+        handle_missing_values(df)
+        df = remove_non_numeric_columns(df)
         eda_results = perform_eda(df)
         detect_outliers(df)
         perform_clustering(df)
@@ -148,7 +158,6 @@ def main(file_path):
         generate_readme(eda_results)
 
 if __name__ == "__main__":
-    from google.colab import files
-    uploaded = files.upload()  # Prompt for file upload in Colab
-    file_path = list(uploaded.keys())[0]
+    # For local environment, user will manually input the file path
+    file_path = input("Please provide the file path to your CSV: ").strip()
     main(file_path)
