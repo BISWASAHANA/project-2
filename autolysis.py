@@ -8,7 +8,13 @@ from sklearn.ensemble import IsolationForest
 from sklearn.cluster import KMeans
 from sklearn.impute import SimpleImputer
 
-# Prompt user to input OpenAI API key manually
+try:
+    import matplotlib
+    print("Matplotlib is already installed.")
+    matplotlib.use('Agg')
+except ImportError:
+    print("Installing matplotlib...")
+
 AIPROXY_TOKEN = input("Please enter your OpenAI API key: ").strip()
 os.environ["AIPROXY_TOKEN"] = AIPROXY_TOKEN
 openai.api_key = AIPROXY_TOKEN
