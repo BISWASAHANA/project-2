@@ -13,6 +13,13 @@ from sklearn.impute import SimpleImputer
 AIPROXY_TOKEN = input("Please enter your OpenAI API key: ").strip()
 os.environ["AIPROXY_TOKEN"] = AIPROXY_TOKEN
 openai.api_key = AIPROXY_TOKEN
+try:
+    import matplotlib
+except ImportError:
+    print("matplotlib not found, installing...")
+    import pip
+    pip.main(['install', 'matplotlib'])
+    import matplotlib
 
 def load_csv(file_path):
     """Load CSV file into a DataFrame with error handling for encoding issues."""
